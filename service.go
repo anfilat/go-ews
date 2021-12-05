@@ -1,6 +1,8 @@
 package ews
 
 import (
+	"context"
+
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsCredentials"
@@ -60,6 +62,7 @@ func (e *ExchangeService) validate() error {
 }
 
 func (e *ExchangeService) GetUserAvailability(
+	ctx context.Context,
 	attendees []ewsType.AttendeeInfo,
 	timeWindow ewsType.TimeWindow,
 	requestedData availabilityData.Enum,
@@ -76,5 +79,5 @@ func (e *ExchangeService) GetUserAvailability(
 	}
 
 	e.ensureClient()
-	return NewGetUserAvailabilityRequest(attendees, timeWindow, requestedData, options).Execute(e)
+	return NewGetUserAvailabilityRequest(attendees, timeWindow, requestedData, options).Execute(ctx, e)
 }

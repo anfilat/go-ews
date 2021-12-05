@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"strings"
@@ -28,8 +29,8 @@ func main() {
 	}
 	timeWindow := ewsType.NewTimeWindow(time.Now(), time.Now().Add(2*24*time.Hour))
 
-	_, err := service.GetUserAvailability(attendee, timeWindow, availabilityData.FreeBusyAndSuggestions,
-		ewsType.NewAvailabilityOptions())
+	_, err := service.GetUserAvailability(context.Background(),
+		attendee, timeWindow, availabilityData.FreeBusyAndSuggestions, ewsType.NewAvailabilityOptions())
 	if err != nil {
 		log.Fatal(err)
 	}

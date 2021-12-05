@@ -1,6 +1,8 @@
 package ews
 
 import (
+	"context"
+
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsType"
@@ -27,7 +29,7 @@ func NewGetUserAvailabilityRequest(
 	}
 }
 
-func (r *getUserAvailabilityRequest) Execute(service *ExchangeService) (*GetUserAvailabilityResults, error) {
+func (r *getUserAvailabilityRequest) Execute(_ context.Context, service *ExchangeService) (*GetUserAvailabilityResults, error) {
 	if err := service.validate(); err != nil {
 		return nil, err
 	}
