@@ -11,6 +11,8 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/anfilat/go-ews/ewsCredentials"
 )
 
 // client is soap client
@@ -34,7 +36,7 @@ func newClient(url string, opt ...option) *client {
 
 type options struct {
 	tlsCfg              *tls.Config
-	credentials         ExchangeCredentials
+	credentials         ewsCredentials.ExchangeCredentials
 	timeout             time.Duration
 	conTimeout          time.Duration
 	tlsHandshakeTimeout time.Duration
@@ -57,7 +59,7 @@ type httpClient interface {
 // An option sets options such as credentials, tls, etc.
 type option func(*options)
 
-func withCredentials(credentials ExchangeCredentials) option {
+func withCredentials(credentials ewsCredentials.ExchangeCredentials) option {
 	return func(o *options) {
 		o.credentials = credentials
 	}

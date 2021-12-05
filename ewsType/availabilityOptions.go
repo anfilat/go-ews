@@ -1,4 +1,4 @@
-package ews
+package ewsType
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"github.com/anfilat/go-ews/enumerations/freeBusyViewType"
 	"github.com/anfilat/go-ews/enumerations/suggestionQuality"
 	"github.com/anfilat/go-ews/internal"
+	"github.com/anfilat/go-ews/internal/validate"
 )
 
 type AvailabilityOptions struct {
@@ -87,7 +88,7 @@ func (a *AvailabilityOptions) WithGlobalObjectId(value string) *AvailabilityOpti
 	return a
 }
 
-func (a *AvailabilityOptions) Validate(value time.Duration) error {
+func (a *AvailabilityOptions) Validate(timeWindow *TimeWindow) error {
 	if a.mergedFreeBusyInterval < 5 || a.mergedFreeBusyInterval > 1440 {
 		return fmt.Errorf(internal.InvalidPropertyValueNotInRange, "MergedFreeBusyInterval", 5, 1440)
 	}
@@ -103,8 +104,8 @@ func (a *AvailabilityOptions) Validate(value time.Duration) error {
 	if a.meetingDuration < 30 || a.meetingDuration > 1440 {
 		return fmt.Errorf(internal.InvalidPropertyValueNotInRange, "MeetingDuration", 30, 1440)
 	}
-	if time.Duration(a.mergedFreeBusyInterval)*time.Minute > value {
+	if time.Duration(a.mergedFreeBusyInterval)*time.Minute > timeWindow.Duration() {
 		return fmt.Errorf(internal.MergedFreeBusyIntervalMustBeSmallerThanTimeWindow)
 	}
-	return internal.ValidateParamAllowNull(a.detailedSuggestionsWindow, "DetailedSuggestionsWindow")
+	return validate.ParamAllowNull(a.detailedSuggestionsWindow, "DetailedSuggestionsWindow")
 }

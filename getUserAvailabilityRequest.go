@@ -3,24 +3,25 @@ package ews
 import (
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
+	"github.com/anfilat/go-ews/ewsType"
 )
 
 type getUserAvailabilityRequest struct {
-	attendees     []AttendeeInfo
-	timeWindow    TimeWindow
+	attendees     []ewsType.AttendeeInfo
+	timeWindow    *ewsType.TimeWindow
 	requestedData availabilityData.Enum
-	options       *AvailabilityOptions
+	options       *ewsType.AvailabilityOptions
 }
 
 func NewGetUserAvailabilityRequest(
-	attendees []AttendeeInfo,
-	timeWindow TimeWindow,
+	attendees []ewsType.AttendeeInfo,
+	timeWindow ewsType.TimeWindow,
 	requestedData availabilityData.Enum,
-	options *AvailabilityOptions,
+	options *ewsType.AvailabilityOptions,
 ) *getUserAvailabilityRequest {
 	return &getUserAvailabilityRequest{
 		attendees:     attendees,
-		timeWindow:    timeWindow,
+		timeWindow:    &timeWindow,
 		requestedData: requestedData,
 		options:       options,
 	}
@@ -62,7 +63,10 @@ func (r *getUserAvailabilityRequest) GetXmlElementName() string {
 }
 
 func (r *getUserAvailabilityRequest) Validate() error {
-	if err := r.options.Validate(r.timeWindow.Duration()); err != nil {
+	if err := r.timeWindow.Validate(); err != nil {
+		return err
+	}
+	if err := r.options.Validate(r.timeWindow); err != nil {
 		return err
 	}
 	return nil

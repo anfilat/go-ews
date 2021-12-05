@@ -5,7 +5,9 @@ import (
 
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
-	"github.com/anfilat/go-ews/internal"
+	"github.com/anfilat/go-ews/ewsCredentials"
+	"github.com/anfilat/go-ews/ewsType"
+	"github.com/anfilat/go-ews/internal/validate"
 )
 
 var (
@@ -15,10 +17,10 @@ var (
 
 type ExchangeService struct {
 	version            exchangeVersion.Enum
-	credentials        ExchangeCredentials
+	credentials        ewsCredentials.ExchangeCredentials
 	url                string
-	ImpersonatedUserId *ImpersonatedUserId
-	PrivilegedUserId   *PrivilegedUserId
+	ImpersonatedUserId *ewsType.ImpersonatedUserId
+	PrivilegedUserId   *ewsType.PrivilegedUserId
 	client             *client
 }
 
@@ -28,7 +30,7 @@ func NewExchangeService(version exchangeVersion.Enum) *ExchangeService {
 	}
 }
 
-func (e *ExchangeService) SetCredentials(credentials ExchangeCredentials) {
+func (e *ExchangeService) SetCredentials(credentials ewsCredentials.ExchangeCredentials) {
 	e.client = nil
 	e.credentials = credentials
 }
@@ -64,18 +66,18 @@ func (e *ExchangeService) validate() error {
 }
 
 func (e *ExchangeService) GetUserAvailability(
-	attendees []AttendeeInfo,
-	timeWindow TimeWindow,
+	attendees []ewsType.AttendeeInfo,
+	timeWindow ewsType.TimeWindow,
 	requestedData availabilityData.Enum,
-	options *AvailabilityOptions,
+	options *ewsType.AvailabilityOptions,
 ) (*GetUserAvailabilityResults, error) {
-	if err := internal.ValidateParamSlice(attendees, "attendees"); err != nil {
+	if err := validate.ParamSlice(attendees, "attendees"); err != nil {
 		return nil, err
 	}
-	if err := internal.ValidateParam(timeWindow, "timeWindow"); err != nil {
+	if err := validate.Param(timeWindow, "timeWindow"); err != nil {
 		return nil, err
 	}
-	if err := internal.ValidateParam(options, "options"); err != nil {
+	if err := validate.Param(options, "options"); err != nil {
 		return nil, err
 	}
 

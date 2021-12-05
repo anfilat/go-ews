@@ -1,7 +1,7 @@
-package ews
+package ewsType
 
 import (
-	"github.com/anfilat/go-ews/internal"
+	"github.com/anfilat/go-ews/internal/validate"
 )
 
 type AttendeeInfo struct {
@@ -15,5 +15,5 @@ func NewAttendeeInfo(smtpAddress string) AttendeeInfo {
 }
 
 func (a AttendeeInfo) Validate() error {
-	return internal.ValidateParam(a.smtpAddress, "SmtpAddress")
+	return validate.Param(a.smtpAddress, "SmtpAddress")
 }

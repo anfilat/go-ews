@@ -1,11 +1,11 @@
-package internal
+package validate
 
 import (
 	"fmt"
 	"reflect"
 )
 
-func ValidateParam(param interface{}, paramName string) error {
+func Param(param interface{}, paramName string) error {
 	type SelfValidate interface {
 		Validate() error
 	}
@@ -25,21 +25,21 @@ func ValidateParam(param interface{}, paramName string) error {
 	return nil
 }
 
-func ValidateParamSlice(param interface{}, paramName string) error {
+func ParamSlice(param interface{}, paramName string) error {
 	slice := reflect.ValueOf(param)
 	if slice.Kind() != reflect.Slice || slice.IsNil() || slice.Len() == 0 {
 		return fmt.Errorf("the collection %s is empty", paramName)
 	}
 
 	for i := 0; i < slice.Len(); i++ {
-		if err := ValidateParam(slice.Index(i).Interface(), fmt.Sprintf("%s [%d]", paramName, i)); err != nil {
+		if err := Param(slice.Index(i).Interface(), fmt.Sprintf("%s [%d]", paramName, i)); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func ValidateParamAllowNull(param interface{}, paramName string) error {
+func ParamAllowNull(param interface{}, paramName string) error {
 	if isNil(param) {
 		return nil
 	}

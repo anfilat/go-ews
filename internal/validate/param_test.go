@@ -1,4 +1,4 @@
-package internal
+package validate
 
 import (
 	"fmt"
@@ -8,30 +8,30 @@ import (
 )
 
 func TestValidateSuccess(t *testing.T) {
-	err := ValidateParam("string", "name")
+	err := Param("string", "name")
 	require.NoError(t, err)
 
-	err = ValidateParam(validateData{data: 42}, "name")
+	err = Param(validateData{data: 42}, "name")
 	require.NoError(t, err)
 
-	err = ValidateParamSlice([]validateData{{data: 42}, {data: 7}}, "name")
+	err = ParamSlice([]validateData{{data: 42}, {data: 7}}, "name")
 	require.NoError(t, err)
 }
 
 func TestValidateFail(t *testing.T) {
-	err := ValidateParam("", "name")
+	err := Param("", "name")
 	require.Error(t, err)
 
-	err = ValidateParam(validateData{data: 0}, "name")
+	err = Param(validateData{data: 0}, "name")
 	require.Error(t, err)
 
-	err = ValidateParamSlice(nil, "name")
+	err = ParamSlice(nil, "name")
 	require.Error(t, err)
 
-	err = ValidateParamSlice([]validateData{}, "name")
+	err = ParamSlice([]validateData{}, "name")
 	require.Error(t, err)
 
-	err = ValidateParamSlice([]validateData{{data: 42}, {data: 0}}, "name")
+	err = ParamSlice([]validateData{{data: 42}, {data: 0}}, "name")
 	require.Error(t, err)
 }
 
