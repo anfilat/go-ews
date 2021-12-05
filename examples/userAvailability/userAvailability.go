@@ -18,7 +18,7 @@ func main() {
 	domain := secret("domain")
 	password := secret("password")
 
-	service := ews.NewExchangeService(exchangeVersion.Exchange2013)
+	service := ews.New(exchangeVersion.Exchange2013)
 	service.SetCredentials(ewsCredentials.NewWebCredentials(login+domain, password))
 	service.SetUrl("https://outlook.office365.com/Ews/Exchange.asmx")
 

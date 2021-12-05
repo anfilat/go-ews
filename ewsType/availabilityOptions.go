@@ -6,8 +6,8 @@ import (
 
 	"github.com/anfilat/go-ews/enumerations/freeBusyViewType"
 	"github.com/anfilat/go-ews/enumerations/suggestionQuality"
-	"github.com/anfilat/go-ews/internal"
-	"github.com/anfilat/go-ews/internal/validate"
+	"github.com/anfilat/go-ews/ewsError"
+	"github.com/anfilat/go-ews/validate"
 )
 
 type AvailabilityOptions struct {
@@ -90,22 +90,22 @@ func (a *AvailabilityOptions) WithGlobalObjectId(value string) *AvailabilityOpti
 
 func (a *AvailabilityOptions) Validate(timeWindow *TimeWindow) error {
 	if a.mergedFreeBusyInterval < 5 || a.mergedFreeBusyInterval > 1440 {
-		return fmt.Errorf(internal.InvalidPropertyValueNotInRange, "MergedFreeBusyInterval", 5, 1440)
+		return ewsError.NewValidateError(fmt.Sprintf("mergedFreeBusyInterval must be between %v and %v", 5, 1440))
 	}
 	if a.goodSuggestionThreshold < 1 || a.goodSuggestionThreshold > 49 {
-		return fmt.Errorf(internal.InvalidPropertyValueNotInRange, "GoodSuggestionThreshold", 1, 49)
+		return ewsError.NewValidateError(fmt.Sprintf("goodSuggestionThreshold must be between %v and %v", 1, 49))
 	}
 	if a.maximumSuggestionsPerDay < 0 || a.maximumSuggestionsPerDay > 48 {
-		return fmt.Errorf(internal.InvalidPropertyValueNotInRange, "MaximumSuggestionsPerDay", 0, 48)
+		return ewsError.NewValidateError(fmt.Sprintf("maximumSuggestionsPerDay must be between %v and %v", 0, 48))
 	}
 	if a.maximumNonWorkHoursSuggestionsPerDay < 0 || a.maximumNonWorkHoursSuggestionsPerDay > 48 {
-		return fmt.Errorf(internal.InvalidPropertyValueNotInRange, "MaximumNonWorkHoursSuggestionsPerDay", 0, 48)
+		return ewsError.NewValidateError(fmt.Sprintf("maximumNonWorkHoursSuggestionsPerDay must be between %v and %v", 0, 48))
 	}
 	if a.meetingDuration < 30 || a.meetingDuration > 1440 {
-		return fmt.Errorf(internal.InvalidPropertyValueNotInRange, "MeetingDuration", 30, 1440)
+		return ewsError.NewValidateError(fmt.Sprintf("meetingDuration must be between %v and %v", 30, 1440))
 	}
 	if time.Duration(a.mergedFreeBusyInterval)*time.Minute > timeWindow.Duration() {
-		return fmt.Errorf(internal.MergedFreeBusyIntervalMustBeSmallerThanTimeWindow)
+		return ewsError.NewValidateError("mergedFreeBusyInterval must be smaller than the specified time window")
 	}
 	return validate.ParamAllowNull(a.detailedSuggestionsWindow, "DetailedSuggestionsWindow")
 }

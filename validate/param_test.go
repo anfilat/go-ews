@@ -1,13 +1,14 @@
 package validate
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/anfilat/go-ews/ewsError"
 )
 
-func TestValidateSuccess(t *testing.T) {
+func TestValidateFilled(t *testing.T) {
 	err := Param("string", "name")
 	require.NoError(t, err)
 
@@ -18,21 +19,21 @@ func TestValidateSuccess(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestValidateFail(t *testing.T) {
+func TestValidateEmpty(t *testing.T) {
 	err := Param("", "name")
-	require.Error(t, err)
+	require.ErrorIs(t, err, ewsError.Validate)
 
 	err = Param(validateData{data: 0}, "name")
-	require.Error(t, err)
+	require.ErrorIs(t, err, ewsError.Validate)
 
 	err = ParamSlice(nil, "name")
-	require.Error(t, err)
+	require.ErrorIs(t, err, ewsError.Validate)
 
 	err = ParamSlice([]validateData{}, "name")
-	require.Error(t, err)
+	require.ErrorIs(t, err, ewsError.Validate)
 
 	err = ParamSlice([]validateData{{data: 42}, {data: 0}}, "name")
-	require.Error(t, err)
+	require.ErrorIs(t, err, ewsError.Validate)
 }
 
 type validateData struct {
@@ -41,7 +42,7 @@ type validateData struct {
 
 func (v validateData) Validate() error {
 	if v.data == 0 {
-		return fmt.Errorf("data is empty")
+		return ewsError.NewValidateError("data is empty")
 	}
 	return nil
 }

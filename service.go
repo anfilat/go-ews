@@ -1,18 +1,12 @@
 package ews
 
 import (
-	"errors"
-
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsCredentials"
+	"github.com/anfilat/go-ews/ewsError"
 	"github.com/anfilat/go-ews/ewsType"
-	"github.com/anfilat/go-ews/internal/validate"
-)
-
-var (
-	ServiceUrlMustBeSet                        = errors.New("the Url property on the ExchangeService object must be set")
-	CannotSetBothImpersonatedAndPrivilegedUser = errors.New("can't set both impersonated user and privileged user in the ExchangeService object")
+	"github.com/anfilat/go-ews/validate"
 )
 
 type ExchangeService struct {
@@ -24,7 +18,7 @@ type ExchangeService struct {
 	client             *client
 }
 
-func NewExchangeService(version exchangeVersion.Enum) *ExchangeService {
+func New(version exchangeVersion.Enum) *ExchangeService {
 	return &ExchangeService{
 		version: version,
 	}
@@ -55,11 +49,11 @@ func (e *ExchangeService) ensureClient() {
 
 func (e *ExchangeService) validate() error {
 	if e.url == "" {
-		return ServiceUrlMustBeSet
+		return ewsError.NewValidateError("the Url property on the ExchangeService object must be set")
 	}
 
 	if e.PrivilegedUserId != nil && e.ImpersonatedUserId != nil {
-		return CannotSetBothImpersonatedAndPrivilegedUser
+		return ewsError.NewValidateError("can't set both impersonated user and privileged user in the ExchangeService object")
 	}
 
 	return nil

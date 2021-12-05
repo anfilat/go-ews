@@ -1,8 +1,9 @@
 package ewsType
 
 import (
-	"fmt"
 	"time"
+
+	"github.com/anfilat/go-ews/ewsError"
 )
 
 type TimeWindow struct {
@@ -19,7 +20,7 @@ func NewTimeWindow(startTime, endTime time.Time) TimeWindow {
 
 func (t TimeWindow) Validate() error {
 	if t.startTime.After(t.endTime) || t.startTime.Equal(t.endTime) {
-		return fmt.Errorf("the time window's end time must be greater than its start time")
+		return ewsError.NewValidateError("the time window's end time must be greater than its start time")
 	}
 	return nil
 }

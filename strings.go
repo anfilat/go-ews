@@ -1,4 +1,4 @@
-package internal
+package ews
 
 const (
 	CannotRemoveSubscriptionFromLiveConnection               = "Subscriptions can't be removed from an open connection."
@@ -31,7 +31,6 @@ const (
 	PercentCompleteMustBeBetween0And100               = "PercentComplete must be between 0 and 100."
 	AutodiscoverServiceIncompatibleWithRequestVersion = "The Autodiscover service only supports {0} or a later version."
 	InvalidAutodiscoverSmtpAddressesCount             = "At least one SMTP address must be requested."
-	ServiceUrlMustBeSet                               = "The Url property on the ExchangeService object must be set."
 	ItemTypeNotCompatible                             = "The item type returned by the service ({0}) isn't compatible with the requested item type ({1})."
 	AttachmentItemTypeMismatch                        = "Can not update this attachment item since the item in the response has a different type."
 	UnsupportedWebProtocol                            = "Protocol {0} isn't supported for service requests."
@@ -134,7 +133,6 @@ const (
 	ObjectTypeIncompatibleWithRequestVersion          = "The object type {0} is only valid for Exchange Server version {1} or later versions."
 	NullStringArrayElementInvalid                     = "The array contains at least one null element."
 	HttpsIsRequired                                   = "Https is required when partner token is expected."
-	MergedFreeBusyIntervalMustBeSmallerThanTimeWindow = "MergedFreeBusyInterval must be smaller than the specified time window"
 	SecondMustBeBetween0And59                         = "Second must be between 0 and 59."
 	AtLeastOneAttachmentCouldNotBeDeleted             = "At least one attachment couldn't be deleted."
 	IdAlreadyInList                                   = "The ID is already in the list."
@@ -179,7 +177,6 @@ const (
 	CreateItemsDoesNotHandleExistingItems             = "This operation can't be performed because at least one item already has an ID."
 	MultipleContactPhotosInAttachment                 = "This operation only allows at most 1 file attachment with IsContactPhoto set."
 	InvalidRecurrenceRange                            = "Invalid recurrence range: ({0})."
-	CannotSetBothImpersonatedAndPrivilegedUser        = "Can't set both impersonated user and privileged user in the ExchangeService object."
 	NewMessagesWithAttachmentsCannotBeSentDirectly    = "New messages with attachments can't be sent directly. You must first save the message and then send it."
 	CannotCallDisconnectWithNoLiveConnection          = "The connection is already closed."
 	IdPropertyMustBeSet                               = "The Id property must be set."
