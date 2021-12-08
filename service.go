@@ -6,9 +6,10 @@ import (
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsCredentials"
-	"github.com/anfilat/go-ews/ewsError"
 	"github.com/anfilat/go-ews/ewsType"
-	"github.com/anfilat/go-ews/validate"
+	"github.com/anfilat/go-ews/internal/errors"
+	"github.com/anfilat/go-ews/internal/requests"
+	"github.com/anfilat/go-ews/internal/validate"
 )
 
 type ExchangeService struct {
@@ -51,11 +52,11 @@ func (e *ExchangeService) ensureClient() {
 
 func (e *ExchangeService) validate() error {
 	if e.url == "" {
-		return ewsError.NewValidateError("the Url property on the ExchangeService object must be set")
+		return errors.NewValidateError("the Url property on the ExchangeService object must be set")
 	}
 
 	if e.PrivilegedUserId != nil && e.ImpersonatedUserId != nil {
-		return ewsError.NewValidateError("can't set both impersonated user and privileged user in the ExchangeService object")
+		return errors.NewValidateError("can't set both impersonated user and privileged user in the ExchangeService object")
 	}
 
 	return nil
@@ -67,7 +68,7 @@ func (e *ExchangeService) GetUserAvailability(
 	timeWindow ewsType.TimeWindow,
 	requestedData availabilityData.Enum,
 	options *ewsType.AvailabilityOptions,
-) (*GetUserAvailabilityResults, error) {
+) (*ewsType.GetUserAvailabilityResults, error) {
 	if err := validate.ParamSlice(attendees, "attendees"); err != nil {
 		return nil, err
 	}
@@ -78,6 +79,7 @@ func (e *ExchangeService) GetUserAvailability(
 		return nil, err
 	}
 
-	e.ensureClient()
-	return NewGetUserAvailabilityRequest(attendees, timeWindow, requestedData, options).Execute(ctx, e)
+	request := requests.NewGetUserAvailabilityRequest(attendees, timeWindow, requestedData, options)
+	result, err := execute(ctx, e, request)
+	return result.(*ewsType.GetUserAvailabilityResults), err
 }

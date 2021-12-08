@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/anfilat/go-ews/ewsError"
+	"github.com/anfilat/go-ews/internal/errors"
 )
 
 func TestValidateFilled(t *testing.T) {
@@ -42,7 +43,7 @@ type validateData struct {
 
 func (v validateData) Validate() error {
 	if v.data == 0 {
-		return ewsError.NewValidateError("data is empty")
+		return errors.NewValidateError("data is empty")
 	}
 	return nil
 }

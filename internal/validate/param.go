@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/anfilat/go-ews/ewsError"
+	"github.com/anfilat/go-ews/internal/errors"
 )
 
 type selfValidate interface {
@@ -15,14 +15,14 @@ func Param(param interface{}, paramName string) error {
 	switch val := param.(type) {
 	case string:
 		if param == "" {
-			return ewsError.NewValidateError(fmt.Sprintf("argument %s is empty", paramName))
+			return errors.NewValidateError(fmt.Sprintf("argument %s is empty", paramName))
 		}
 	case selfValidate:
 		if err := val.Validate(); err != nil {
-			return ewsError.NewValidateErrorWithWrap(err, fmt.Sprintf("invalid parameter %s: %s", paramName, err))
+			return errors.NewValidateErrorWithWrap(err, fmt.Sprintf("invalid parameter %s: %s", paramName, err))
 		}
 	default:
-		return ewsError.NewValidateError(fmt.Sprintf("invalid param type for %s", paramName))
+		return errors.NewValidateError(fmt.Sprintf("invalid param type for %s", paramName))
 	}
 	return nil
 }
@@ -30,7 +30,7 @@ func Param(param interface{}, paramName string) error {
 func ParamSlice(param interface{}, paramName string) error {
 	slice := reflect.ValueOf(param)
 	if slice.Kind() != reflect.Slice || slice.IsNil() || slice.Len() == 0 {
-		return ewsError.NewValidateError(fmt.Sprintf("the collection %s is empty", paramName))
+		return errors.NewValidateError(fmt.Sprintf("the collection %s is empty", paramName))
 	}
 
 	for i := 0; i < slice.Len(); i++ {
@@ -52,7 +52,7 @@ func ParamAllowNull(param interface{}, paramName string) error {
 	}
 
 	if err := val.Validate(); err != nil {
-		return ewsError.NewValidateErrorWithWrap(err, fmt.Sprintf("invalid parameter %s: %s", paramName, err))
+		return errors.NewValidateErrorWithWrap(err, fmt.Sprintf("invalid parameter %s: %s", paramName, err))
 	}
 
 	return nil

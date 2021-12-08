@@ -1,8 +1,6 @@
-package ews
+package requests
 
 import (
-	"context"
-
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsType"
@@ -20,24 +18,13 @@ func NewGetUserAvailabilityRequest(
 	timeWindow ewsType.TimeWindow,
 	requestedData availabilityData.Enum,
 	options *ewsType.AvailabilityOptions,
-) *getUserAvailabilityRequest {
+) Request {
 	return &getUserAvailabilityRequest{
 		attendees:     attendees,
 		timeWindow:    &timeWindow,
 		requestedData: requestedData,
 		options:       options,
 	}
-}
-
-func (r *getUserAvailabilityRequest) Execute(_ context.Context, service *ExchangeService) (*GetUserAvailabilityResults, error) {
-	if err := service.validate(); err != nil {
-		return nil, err
-	}
-	if err := r.Validate(); err != nil {
-		return nil, err
-	}
-
-	return nil, nil
 }
 
 func (r *getUserAvailabilityRequest) IsFreeBusyViewRequested() bool {

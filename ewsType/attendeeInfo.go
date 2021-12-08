@@ -1,7 +1,7 @@
 package ewsType
 
 import (
-	"github.com/anfilat/go-ews/validate"
+	"github.com/anfilat/go-ews/internal/validate"
 )
 
 type AttendeeInfo struct {

@@ -1,4 +1,4 @@
-package ews
+package ewsType
 
 import "github.com/anfilat/go-ews/wsdl"
 
