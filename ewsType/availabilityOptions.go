@@ -88,7 +88,7 @@ func (a *AvailabilityOptions) WithGlobalObjectId(value string) *AvailabilityOpti
 	return a
 }
 
-func (a *AvailabilityOptions) Validate(timeWindow *TimeWindow) error {
+func (a *AvailabilityOptions) Validate() error {
 	if a.mergedFreeBusyInterval < 5 || a.mergedFreeBusyInterval > 1440 {
 		return errors.NewValidateError(fmt.Sprintf("mergedFreeBusyInterval must be between %v and %v", 5, 1440))
 	}
@@ -104,8 +104,12 @@ func (a *AvailabilityOptions) Validate(timeWindow *TimeWindow) error {
 	if a.meetingDuration < 30 || a.meetingDuration > 1440 {
 		return errors.NewValidateError(fmt.Sprintf("meetingDuration must be between %v and %v", 30, 1440))
 	}
-	if time.Duration(a.mergedFreeBusyInterval)*time.Minute > timeWindow.Duration() {
-		return errors.NewValidateError("mergedFreeBusyInterval must be smaller than the specified time window")
-	}
 	return validate.ParamAllowNull(a.detailedSuggestionsWindow, "DetailedSuggestionsWindow")
+}
+
+func (a *AvailabilityOptions) ValidateTimeWindow(timeWindow *TimeWindow) error {
+	if time.Duration(a.mergedFreeBusyInterval)*time.Minute > timeWindow.Duration() {
+		return fmt.Errorf("mergedFreeBusyInterval must be smaller than the specified time window")
+	}
+	return nil
 }

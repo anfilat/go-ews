@@ -55,7 +55,7 @@ func (r *getUserAvailabilityRequest) Validate() error {
 	if err := r.timeWindow.Validate(); err != nil {
 		return err
 	}
-	if err := r.options.Validate(r.timeWindow); err != nil {
+	if err := r.options.ValidateTimeWindow(r.timeWindow); err != nil {
 		return err
 	}
 	return nil

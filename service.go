@@ -13,12 +13,14 @@ import (
 )
 
 type ExchangeService struct {
-	version            exchangeVersion.Enum
-	credentials        ewsCredentials.ExchangeCredentials
-	url                string
-	ImpersonatedUserId *ewsType.ImpersonatedUserId
-	PrivilegedUserId   *ewsType.PrivilegedUserId
-	client             *client
+	ImpersonatedUserId            *ewsType.ImpersonatedUserId
+	PrivilegedUserId              *ewsType.PrivilegedUserId
+	Exchange2007CompatibilityMode bool
+
+	version     exchangeVersion.Enum
+	credentials ewsCredentials.ExchangeCredentials
+	url         string
+	client      *client
 }
 
 func New(version exchangeVersion.Enum) *ExchangeService {
@@ -62,6 +64,13 @@ func (e *ExchangeService) validate() error {
 	return nil
 }
 
+func (e *ExchangeService) getRequestedServiceVersionString() string {
+	if e.Exchange2007CompatibilityMode && e.version == exchangeVersion.Exchange2007SP1 {
+		return "Exchange2007"
+	}
+	return e.version.String()
+}
+
 func (e *ExchangeService) GetUserAvailability(
 	ctx context.Context,
 	attendees []ewsType.AttendeeInfo,
@@ -80,6 +89,7 @@ func (e *ExchangeService) GetUserAvailability(
 	}
 
 	request := requests.NewGetUserAvailabilityRequest(attendees, timeWindow, requestedData, options)
-	result, err := execute(ctx, e, request)
-	return result.(*ewsType.GetUserAvailabilityResults), err
+	_, err := execute(ctx, e, request)
+	// return result.(*ewsType.GetUserAvailabilityResults), err
+	return nil, err
 }
