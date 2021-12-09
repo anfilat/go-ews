@@ -1,6 +1,7 @@
 package ews
 
 import (
+	"github.com/anfilat/go-ews/enumerations/dateTimePrecision"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
 	"github.com/anfilat/go-ews/internal/requests"
@@ -53,14 +54,8 @@ func (w *RequestWriter) writeHeader() {
 
 	w.writeVersionHeader()
 	w.writeTimeZoneHeader()
-
-	if w.Service.ImpersonatedUserId != nil {
-		w.Service.ImpersonatedUserId.WriteToXml(w.w, w.Service.Version)
-	} else if w.Service.PrivilegedUserId != nil {
-		w.Service.PrivilegedUserId.WriteToXml(w.w, w.Service.Version)
-	} else if w.Service.ManagementRoles != nil {
-		w.Service.ManagementRoles.WriteToXml(w.w)
-	}
+	w.writeDateTimePrecision()
+	w.writeUserOrRoles()
 
 	w.w.WriteEndElement()
 }
@@ -69,6 +64,22 @@ func (w *RequestWriter) writeVersionHeader() {
 	w.w.WriteStartElement(xmlNamespace.Types, "RequestServerVersion")
 	w.w.WriteAttributeValueBool("Version", false, w.Service.GetRequestedServiceVersionString())
 	w.w.WriteEndElement()
+}
+
+func (w *RequestWriter) writeDateTimePrecision() {
+	if w.Service.DateTimePrecision != dateTimePrecision.Default {
+		w.w.WriteElementValue(xmlNamespace.Types, "DateTimePrecision", w.Service.DateTimePrecision.String())
+	}
+}
+
+func (w *RequestWriter) writeUserOrRoles() {
+	if w.Service.ImpersonatedUserId != nil {
+		w.Service.ImpersonatedUserId.WriteToXml(w.w, w.Service.Version)
+	} else if w.Service.PrivilegedUserId != nil {
+		w.Service.PrivilegedUserId.WriteToXml(w.w, w.Service.Version)
+	} else if w.Service.ManagementRoles != nil {
+		w.Service.ManagementRoles.WriteToXml(w.w)
+	}
 }
 
 func (w *RequestWriter) writeTimeZoneHeader() {

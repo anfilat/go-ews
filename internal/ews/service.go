@@ -1,6 +1,7 @@
 package ews
 
 import (
+	"github.com/anfilat/go-ews/enumerations/dateTimePrecision"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsCredentials"
 	"github.com/anfilat/go-ews/ewsType"
@@ -8,15 +9,16 @@ import (
 )
 
 type Data struct {
+	Url                           string
+	Credentials                   ewsCredentials.ExchangeCredentials
+	Version                       exchangeVersion.Enum
 	ImpersonatedUserId            *ewsType.ImpersonatedUserId
 	PrivilegedUserId              *ewsType.PrivilegedUserId
 	ManagementRoles               *ewsType.ManagementRoles
 	Exchange2007CompatibilityMode bool
+	DateTimePrecision             dateTimePrecision.Enum
 
-	Version     exchangeVersion.Enum
-	Credentials ewsCredentials.ExchangeCredentials
-	Url         string
-	Client      *Client
+	Client *Client
 }
 
 func (d *Data) EnsureClient() {

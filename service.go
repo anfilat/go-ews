@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
+	"github.com/anfilat/go-ews/enumerations/dateTimePrecision"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsCredentials"
 	"github.com/anfilat/go-ews/ewsType"
@@ -19,7 +20,8 @@ type ExchangeService struct {
 func New(version exchangeVersion.Enum) *ExchangeService {
 	return &ExchangeService{
 		data: &ews.Data{
-			Version: version,
+			Version:           version,
+			DateTimePrecision: dateTimePrecision.Default,
 		},
 	}
 }
@@ -48,6 +50,10 @@ func (e *ExchangeService) SetManagementRoles(value *ewsType.ManagementRoles) {
 
 func (e *ExchangeService) SetExchange2007CompatibilityMode(value bool) {
 	e.data.Exchange2007CompatibilityMode = value
+}
+
+func (e *ExchangeService) SetDateTimePrecision(value dateTimePrecision.Enum) {
+	e.data.DateTimePrecision = value
 }
 
 func (e *ExchangeService) GetUserAvailability(
