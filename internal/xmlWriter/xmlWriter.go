@@ -105,7 +105,7 @@ func (w *Writer) WriteAttributeValueBool(localName string, alwaysWriteEmptyStrin
 		return
 	}
 	if alwaysWriteEmptyString || val != "" {
-		w.writeAttributeString("", localName, val)
+		w.WriteAttributeString("", localName, val)
 	}
 }
 
@@ -116,11 +116,11 @@ func (w *Writer) WriteAttributeValue(namespacePrefix, localName string, value in
 		return
 	}
 	if val != "" {
-		w.writeAttributeString(namespacePrefix, localName, val)
+		w.WriteAttributeString(namespacePrefix, localName, val)
 	}
 }
 
-func (w *Writer) writeAttributeString(namespacePrefix, localName, value string) {
+func (w *Writer) WriteAttributeString(namespacePrefix, localName, value string) {
 	w.ec.Do(w.w.WriteAttr(xmlwriter.Attr{
 		Prefix: namespacePrefix,
 		URI:    "",

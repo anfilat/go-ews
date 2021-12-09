@@ -26,6 +26,7 @@ func (w *RequestWriter) WriteXML() ([]byte, error) {
 	w.writeRoot()
 
 	w.writeHeader()
+	w.writeBody()
 
 	w.w.WriteEndElement()
 	w.w.WriteEndDoc()
@@ -55,7 +56,11 @@ func (w *RequestWriter) writeHeader() {
 
 	if w.Service.ImpersonatedUserId != nil {
 		w.Service.ImpersonatedUserId.WriteToXml(w.w, w.Service.Version)
+	} else if w.Service.PrivilegedUserId != nil {
+		w.Service.PrivilegedUserId.WriteToXml(w.w, w.Service.Version)
 	}
+
+	w.w.WriteEndElement()
 }
 
 func (w *RequestWriter) writeVersionHeader() {
@@ -82,4 +87,10 @@ func (w *RequestWriter) isEmitTimeZoneHeader() bool {
 		return val.EmitTimeZoneHeader()
 	}
 	return false
+}
+
+func (w *RequestWriter) writeBody() {
+	w.w.WriteStartElement(xmlNamespace.Soap, "Body")
+
+	w.w.WriteEndElement()
 }

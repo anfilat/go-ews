@@ -3,6 +3,24 @@ package freeBusyViewType
 // Enum defines the type of free/busy information returned by a GetUserAvailability operation.
 type Enum int
 
+func (e Enum) String() string {
+	switch e {
+	case None:
+		return "None"
+	case MergedOnly:
+		return "MergedOnly"
+	case FreeBusy:
+		return "FreeBusy"
+	case FreeBusyMerged:
+		return "FreeBusyMerged"
+	case Detailed:
+		return "Detailed"
+	case DetailedMerged:
+		return "DetailedMerged"
+	}
+	return ""
+}
+
 const (
 	// None - No view could be returned. This value cannot be specified in a call to GetUserAvailability.
 	None Enum = iota

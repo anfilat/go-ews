@@ -2,16 +2,19 @@ package ewsType
 
 import (
 	"github.com/anfilat/go-ews/enumerations/connectingIdType"
+	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/enumerations/privilegedLogonType"
 	"github.com/anfilat/go-ews/enumerations/privilegedUserIdBudgetType"
+	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
+	"github.com/anfilat/go-ews/internal/errors"
+	"github.com/anfilat/go-ews/internal/xmlWriter"
 )
 
 type PrivilegedUserId struct {
-	LogonType privilegedLogonType.Enum
-	IdType    connectingIdType.Enum
-	Id        string
-	//nolint:structcheck,unused
-	budgetType privilegedUserIdBudgetType.Enum
+	LogonType  privilegedLogonType.Enum
+	IdType     connectingIdType.Enum
+	Id         string
+	BudgetType *privilegedUserIdBudgetType.Enum
 }
 
 func NewPrivilegedUserId(logonType privilegedLogonType.Enum, idType connectingIdType.Enum, id string) PrivilegedUserId {
@@ -20,4 +23,25 @@ func NewPrivilegedUserId(logonType privilegedLogonType.Enum, idType connectingId
 		IdType:    idType,
 		Id:        id,
 	}
+}
+
+func (u *PrivilegedUserId) Validate() error {
+	if u.Id == "" {
+		return errors.NewValidateError("the Id property of PrivilegedUserId must be set")
+	}
+	return nil
+}
+
+func (u *PrivilegedUserId) WriteToXml(writer *xmlWriter.Writer, version exchangeVersion.Enum) {
+	writer.WriteStartElement(xmlNamespace.Types, "OpenAsAdminOrSystemService")
+	writer.WriteAttributeString("", "LogonType", u.LogonType.String())
+	if version >= exchangeVersion.Exchange2013 && u.BudgetType != nil {
+		writer.WriteAttributeString("", "BudgetType", u.BudgetType.String())
+	}
+
+	writer.WriteStartElement(xmlNamespace.Types, "ConnectingSID")
+	writer.WriteElementValue(xmlNamespace.Types, u.IdType.String(), u.Id)
+	writer.WriteEndElement()
+
+	writer.WriteEndElement()
 }

@@ -36,6 +36,11 @@ func (d *Data) Validate() error {
 		return errors.NewValidateError("the Url property on the ExchangeService object must be set")
 	}
 
+	if d.PrivilegedUserId != nil {
+		if err := d.PrivilegedUserId.Validate(); err != nil {
+			return err
+		}
+	}
 	if d.ImpersonatedUserId != nil {
 		if err := d.ImpersonatedUserId.Validate(); err != nil {
 			return err
