@@ -7,68 +7,43 @@ import (
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsCredentials"
 	"github.com/anfilat/go-ews/ewsType"
-	"github.com/anfilat/go-ews/internal/errors"
+	"github.com/anfilat/go-ews/internal/ews"
 	"github.com/anfilat/go-ews/internal/requests"
 	"github.com/anfilat/go-ews/internal/validate"
 )
 
 type ExchangeService struct {
-	ImpersonatedUserId            *ewsType.ImpersonatedUserId
-	PrivilegedUserId              *ewsType.PrivilegedUserId
-	Exchange2007CompatibilityMode bool
-
-	version     exchangeVersion.Enum
-	credentials ewsCredentials.ExchangeCredentials
-	url         string
-	client      *client
+	data *ews.Data
 }
 
 func New(version exchangeVersion.Enum) *ExchangeService {
 	return &ExchangeService{
-		version: version,
+		data: &ews.Data{
+			Version: version,
+		},
 	}
 }
 
-func (e *ExchangeService) SetCredentials(credentials ewsCredentials.ExchangeCredentials) {
-	e.client = nil
-	e.credentials = credentials
+func (e *ExchangeService) SetCredentials(value ewsCredentials.ExchangeCredentials) {
+	e.data.Client = nil
+	e.data.Credentials = value
 }
 
-func (e *ExchangeService) SetUrl(url string) {
-	e.client = nil
-	e.url = url
+func (e *ExchangeService) SetUrl(value string) {
+	e.data.Client = nil
+	e.data.Url = value
 }
 
-func (e *ExchangeService) ensureClient() {
-	if e.client != nil {
-		return
-	}
-
-	var opts []option
-	if e.credentials != nil {
-		opts = append(opts, withCredentials(e.credentials))
-	}
-
-	e.client = newClient(e.url, opts...)
+func (e *ExchangeService) SetImpersonatedUserId(value *ewsType.ImpersonatedUserId) {
+	e.data.ImpersonatedUserId = value
 }
 
-func (e *ExchangeService) validate() error {
-	if e.url == "" {
-		return errors.NewValidateError("the Url property on the ExchangeService object must be set")
-	}
-
-	if e.PrivilegedUserId != nil && e.ImpersonatedUserId != nil {
-		return errors.NewValidateError("can't set both impersonated user and privileged user in the ExchangeService object")
-	}
-
-	return nil
+func (e *ExchangeService) SetPrivilegedUserId(value *ewsType.PrivilegedUserId) {
+	e.data.PrivilegedUserId = value
 }
 
-func (e *ExchangeService) getRequestedServiceVersionString() string {
-	if e.Exchange2007CompatibilityMode && e.version == exchangeVersion.Exchange2007SP1 {
-		return "Exchange2007"
-	}
-	return e.version.String()
+func (e *ExchangeService) SetExchange2007CompatibilityMode(value bool) {
+	e.data.Exchange2007CompatibilityMode = value
 }
 
 func (e *ExchangeService) GetUserAvailability(
@@ -89,7 +64,7 @@ func (e *ExchangeService) GetUserAvailability(
 	}
 
 	request := requests.NewGetUserAvailabilityRequest(attendees, timeWindow, requestedData, options)
-	_, err := execute(ctx, e, request)
+	_, err := execute(ctx, e.data, request)
 	// return result.(*ewsType.GetUserAvailabilityResults), err
 	return nil, err
 }

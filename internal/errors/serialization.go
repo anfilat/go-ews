@@ -6,20 +6,38 @@ import (
 	"github.com/anfilat/go-ews/ewsError"
 )
 
-func NewSerializationError(val interface{}, localName string) error {
-	return &serializationError{val, localName}
+func NewAttrSerializationError(val interface{}, localName string) error {
+	return &attrSerializationError{val, localName}
 }
 
-type serializationError struct {
+type attrSerializationError struct {
 	val       interface{}
 	localName string
 }
 
-func (e *serializationError) Error() string {
+func (e *attrSerializationError) Error() string {
 	return fmt.Sprintf("value %v can't be used for the %s attribute", e.val, e.localName)
 }
 
-func (e *serializationError) Is(target error) bool {
-	//nolint:serializationError
+func (e *attrSerializationError) Is(target error) bool {
+	//nolint:errorlint
+	return target == ewsError.Serialization
+}
+
+func NewValueSerializationError(val interface{}, localName string) error {
+	return &valueSerializationError{val, localName}
+}
+
+type valueSerializationError struct {
+	val       interface{}
+	localName string
+}
+
+func (e *valueSerializationError) Error() string {
+	return fmt.Sprintf("values %v can't be used for the %s element", e.val, e.localName)
+}
+
+func (e *valueSerializationError) Is(target error) bool {
+	//nolint:errorlint
 	return target == ewsError.Serialization
 }

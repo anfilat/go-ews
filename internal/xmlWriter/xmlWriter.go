@@ -11,7 +11,7 @@ import (
 	"github.com/anfilat/go-ews/internal/utils"
 )
 
-type writer struct {
+type Writer struct {
 	IsTimeZoneHeaderEmitted bool
 
 	b  *bytes.Buffer
@@ -22,42 +22,42 @@ type writer struct {
 	rootUris  []string
 }
 
-func New() *writer {
+func New() *Writer {
 	b := &bytes.Buffer{}
 	w := xmlwriter.Open(b, xmlwriter.WithIndent())
 	ec := &xmlwriter.ErrCollector{}
 
-	return &writer{
+	return &Writer{
 		b:  b,
 		w:  w,
 		ec: ec,
 	}
 }
 
-func (w *writer) Err() error {
+func (w *Writer) Err() error {
 	if w.ec.Err != nil {
 		return errors.NewWriteXMLError(w.ec)
 	}
 	return nil
 }
 
-func (w *writer) Bytes() []byte {
+func (w *Writer) Bytes() []byte {
 	return w.b.Bytes()
 }
 
-func (w *writer) Flush() {
+func (w *Writer) Flush() {
 	w.ec.Do(w.w.Flush())
 }
 
-func (w *writer) WriteDoc() {
+func (w *Writer) WriteDoc() {
 	w.ec.Do(w.w.StartDoc(xmlwriter.Doc{}))
 }
 
-func (w *writer) WriteEndDoc() {
+func (w *Writer) WriteEndDoc() {
 	w.ec.Do(w.w.EndDoc())
 }
 
-func (w *writer) WriteStartElement(namespace xmlNamespace.Enum, localName string) {
+func (w *Writer) WriteStartElement(namespace xmlNamespace.Enum, localName string) {
 	prefix := utils.GetNamespacePrefix(namespace)
 	uri := utils.GetNamespaceUri(namespace)
 
@@ -74,14 +74,34 @@ func (w *writer) WriteStartElement(namespace xmlNamespace.Enum, localName string
 	}))
 }
 
-func (w *writer) WriteEndElement() {
+func (w *Writer) WriteEndElement() {
 	w.ec.Do(w.w.EndElem())
 }
 
-func (w *writer) WriteAttributeValueBool(localName string, alwaysWriteEmptyString bool, value interface{}) {
+func (w *Writer) WriteElementValue(namespace xmlNamespace.Enum, localName string, value interface{}) {
+	if value == nil {
+		return
+	}
+
 	val, ok := w.tryConvertObjectToString(value)
 	if !ok {
-		w.ec.Do(errors.NewSerializationError(value, localName))
+		w.ec.Do(errors.NewValueSerializationError(value, localName))
+		return
+	}
+
+	w.WriteStartElement(namespace, localName)
+	w.WriteValue(val)
+	w.WriteEndElement()
+}
+
+func (w *Writer) WriteValue(value string) {
+	w.ec.Do(w.w.WriteText(value))
+}
+
+func (w *Writer) WriteAttributeValueBool(localName string, alwaysWriteEmptyString bool, value interface{}) {
+	val, ok := w.tryConvertObjectToString(value)
+	if !ok {
+		w.ec.Do(errors.NewAttrSerializationError(value, localName))
 		return
 	}
 	if alwaysWriteEmptyString || val != "" {
@@ -89,10 +109,10 @@ func (w *writer) WriteAttributeValueBool(localName string, alwaysWriteEmptyStrin
 	}
 }
 
-func (w *writer) WriteAttributeValue(namespacePrefix, localName string, value interface{}) {
+func (w *Writer) WriteAttributeValue(namespacePrefix, localName string, value interface{}) {
 	val, ok := w.tryConvertObjectToString(value)
 	if !ok {
-		w.ec.Do(errors.NewSerializationError(value, localName))
+		w.ec.Do(errors.NewAttrSerializationError(value, localName))
 		return
 	}
 	if val != "" {
@@ -100,7 +120,7 @@ func (w *writer) WriteAttributeValue(namespacePrefix, localName string, value in
 	}
 }
 
-func (w *writer) writeAttributeString(namespacePrefix, localName, value string) {
+func (w *Writer) writeAttributeString(namespacePrefix, localName, value string) {
 	w.ec.Do(w.w.WriteAttr(xmlwriter.Attr{
 		Prefix: namespacePrefix,
 		URI:    "",
@@ -111,21 +131,21 @@ func (w *writer) writeAttributeString(namespacePrefix, localName, value string) 
 	w.pushUris(localName, value)
 }
 
-func (w *writer) StartRoot() {
+func (w *Writer) StartRoot() {
 	w.rootLevel = true
 }
 
-func (w *writer) EndRoot() {
+func (w *Writer) EndRoot() {
 	w.rootLevel = false
 }
 
-func (w *writer) pushUris(prefix string, uri string) {
+func (w *Writer) pushUris(prefix string, uri string) {
 	if w.rootLevel {
 		w.rootUris = append(w.rootUris, prefix+":"+uri)
 	}
 }
 
-func (w *writer) checkRootUri(prefix string, uri string) bool {
+func (w *Writer) checkRootUri(prefix string, uri string) bool {
 	for _, val := range w.rootUris {
 		if val == prefix+":"+uri {
 			return true
@@ -134,7 +154,7 @@ func (w *writer) checkRootUri(prefix string, uri string) bool {
 	return false
 }
 
-func (w *writer) tryConvertObjectToString(value interface{}) (string, bool) {
+func (w *Writer) tryConvertObjectToString(value interface{}) (string, bool) {
 	switch val := value.(type) {
 	case bool:
 		if val {

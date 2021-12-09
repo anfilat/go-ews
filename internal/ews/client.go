@@ -16,19 +16,19 @@ import (
 )
 
 // client is soap client
-type client struct {
+type Client struct {
 	url     string
 	opts    *options
 	headers []interface{}
 }
 
-// newClient creates new SOAP client instance
-func newClient(url string, opt ...option) *client {
+// NewClient creates new SOAP client instance
+func NewClient(url string, opt ...Option) *Client {
 	opts := defaultOptions
 	for _, o := range opt {
 		o(&opts)
 	}
-	return &client{
+	return &Client{
 		url:  url,
 		opts: &opts,
 	}
@@ -56,10 +56,10 @@ type httpClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// An option sets options such as credentials, tls, etc.
-type option func(*options)
+// An Option sets options such as credentials, tls, etc.
+type Option func(*options)
 
-func withCredentials(credentials ewsCredentials.ExchangeCredentials) option {
+func WithCredentials(credentials ewsCredentials.ExchangeCredentials) Option {
 	return func(o *options) {
 		o.credentials = credentials
 	}
@@ -67,19 +67,19 @@ func withCredentials(credentials ewsCredentials.ExchangeCredentials) option {
 
 // addHeader adds envelope header
 // For correct behavior, every header must contain a `XMLName` field.  Refer to #121 for details
-func (s *client) addHeader(header interface{}) {
+func (s *Client) addHeader(header interface{}) {
 	s.headers = append(s.headers, header)
 }
 
 // setHeaders sets envelope headers, overwriting any existing headers.
 // For correct behavior, every header must contain a `XMLName` field.  Refer to #121 for details
-func (s *client) setHeaders(headers ...interface{}) {
+func (s *Client) setHeaders(headers ...interface{}) {
 	s.headers = headers
 }
 
 const XmlNsSoapEnv string = "http://schemas.xmlsoap.org/soap/envelope/"
 
-func (s *client) call(ctx context.Context, soapAction string, request, response interface{}) error {
+func (s *Client) call(ctx context.Context, soapAction string, request, response interface{}) error {
 	// SOAP envelope capable of namespace prefixes
 	envelope := SOAPEnvelope{
 		XmlNS: XmlNsSoapEnv,
