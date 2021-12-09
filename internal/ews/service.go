@@ -10,6 +10,7 @@ import (
 type Data struct {
 	ImpersonatedUserId            *ewsType.ImpersonatedUserId
 	PrivilegedUserId              *ewsType.PrivilegedUserId
+	ManagementRoles               *ewsType.ManagementRoles
 	Exchange2007CompatibilityMode bool
 
 	Version     exchangeVersion.Enum
@@ -43,6 +44,11 @@ func (d *Data) Validate() error {
 	}
 	if d.ImpersonatedUserId != nil {
 		if err := d.ImpersonatedUserId.Validate(); err != nil {
+			return err
+		}
+	}
+	if d.ManagementRoles != nil {
+		if err := d.ManagementRoles.Validate(); err != nil {
 			return err
 		}
 	}

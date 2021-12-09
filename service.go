@@ -42,6 +42,10 @@ func (e *ExchangeService) SetPrivilegedUserId(value *ewsType.PrivilegedUserId) {
 	e.data.PrivilegedUserId = value
 }
 
+func (e *ExchangeService) SetManagementRoles(value *ewsType.ManagementRoles) {
+	e.data.ManagementRoles = value
+}
+
 func (e *ExchangeService) SetExchange2007CompatibilityMode(value bool) {
 	e.data.Exchange2007CompatibilityMode = value
 }

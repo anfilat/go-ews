@@ -58,6 +58,8 @@ func (w *RequestWriter) writeHeader() {
 		w.Service.ImpersonatedUserId.WriteToXml(w.w, w.Service.Version)
 	} else if w.Service.PrivilegedUserId != nil {
 		w.Service.PrivilegedUserId.WriteToXml(w.w, w.Service.Version)
+	} else if w.Service.ManagementRoles != nil {
+		w.Service.ManagementRoles.WriteToXml(w.w)
 	}
 
 	w.w.WriteEndElement()
