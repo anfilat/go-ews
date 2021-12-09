@@ -2,6 +2,7 @@ package xmlWriter
 
 import (
 	"bytes"
+	"strconv"
 
 	"github.com/shabbyrobe/xmlwriter"
 
@@ -16,6 +17,9 @@ type writer struct {
 	b  *bytes.Buffer
 	w  *xmlwriter.Writer
 	ec *xmlwriter.ErrCollector
+
+	rootLevel bool
+	rootUris  []string
 }
 
 func New() *writer {
@@ -54,10 +58,19 @@ func (w *writer) WriteEndDoc() {
 }
 
 func (w *writer) WriteStartElement(namespace xmlNamespace.Enum, localName string) {
+	prefix := utils.GetNamespacePrefix(namespace)
+	uri := utils.GetNamespaceUri(namespace)
+
+	if w.checkRootUri(prefix, uri) {
+		uri = ""
+	} else {
+		w.pushUris(prefix, uri)
+	}
+
 	w.ec.Do(w.w.StartElem(xmlwriter.Elem{
-		Prefix: utils.GetNamespacePrefix(namespace),
+		Prefix: prefix,
 		Name:   localName,
-		URI:    utils.GetNamespaceUri(namespace),
+		URI:    uri,
 	}))
 }
 
@@ -69,6 +82,7 @@ func (w *writer) WriteAttributeValueBool(localName string, alwaysWriteEmptyStrin
 	val, ok := w.tryConvertObjectToString(value)
 	if !ok {
 		w.ec.Do(errors.NewSerializationError(value, localName))
+		return
 	}
 	if alwaysWriteEmptyString || val != "" {
 		w.writeAttributeString("", localName, val)
@@ -79,6 +93,7 @@ func (w *writer) WriteAttributeValue(namespacePrefix, localName string, value in
 	val, ok := w.tryConvertObjectToString(value)
 	if !ok {
 		w.ec.Do(errors.NewSerializationError(value, localName))
+		return
 	}
 	if val != "" {
 		w.writeAttributeString(namespacePrefix, localName, val)
@@ -92,10 +107,64 @@ func (w *writer) writeAttributeString(namespacePrefix, localName, value string) 
 		Name:   localName,
 		Value:  value,
 	}))
+
+	w.pushUris(localName, value)
+}
+
+func (w *writer) StartRoot() {
+	w.rootLevel = true
+}
+
+func (w *writer) EndRoot() {
+	w.rootLevel = false
+}
+
+func (w *writer) pushUris(prefix string, uri string) {
+	if w.rootLevel {
+		w.rootUris = append(w.rootUris, prefix+":"+uri)
+	}
+}
+
+func (w *writer) checkRootUri(prefix string, uri string) bool {
+	for _, val := range w.rootUris {
+		if val == prefix+":"+uri {
+			return true
+		}
+	}
+	return false
 }
 
 func (w *writer) tryConvertObjectToString(value interface{}) (string, bool) {
 	switch val := value.(type) {
+	case bool:
+		if val {
+			return "true", true
+		}
+		return "false", true
+	case int:
+		return strconv.FormatInt(int64(val), 10), true
+	case int8:
+		return strconv.FormatInt(int64(val), 10), true
+	case int16:
+		return strconv.FormatInt(int64(val), 10), true
+	case int32:
+		return strconv.FormatInt(int64(val), 10), true
+	case int64:
+		return strconv.FormatInt(val, 10), true
+	case uint:
+		return strconv.FormatUint(uint64(val), 10), true
+	case uint8:
+		return strconv.FormatUint(uint64(val), 10), true
+	case uint16:
+		return strconv.FormatUint(uint64(val), 10), true
+	case uint32:
+		return strconv.FormatUint(uint64(val), 10), true
+	case uint64:
+		return strconv.FormatUint(val, 10), true
+	case float32:
+		return strconv.FormatFloat(float64(val), 'f', -1, 64), true
+	case float64:
+		return strconv.FormatFloat(val, 'f', -1, 64), true
 	case string:
 		return val, true
 	}

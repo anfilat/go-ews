@@ -12,8 +12,7 @@ func GetNamespacePrefix(namespace xmlNamespace.Enum) string {
 		return "m"
 	case xmlNamespace.Errors:
 		return "e"
-	case xmlNamespace.Soap:
-	case xmlNamespace.Soap12:
+	case xmlNamespace.Soap, xmlNamespace.Soap12:
 		return "soap"
 	case xmlNamespace.XmlSchemaInstance:
 		return "xsi"

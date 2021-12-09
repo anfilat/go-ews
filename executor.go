@@ -31,10 +31,13 @@ func writeXML(service *ExchangeService, request requests.Request) ([]byte, error
 	w := xmlWriter.New()
 
 	w.WriteDoc()
+
+	w.StartRoot()
 	w.WriteStartElement(xmlNamespace.Soap, "Envelope")
 	w.WriteAttributeValue("xmlns", "xsi", "http://www.w3.org/2001/XMLSchema-instance")
 	w.WriteAttributeValue("xmlns", "m", "http://schemas.microsoft.com/exchange/services/2006/messages")
 	w.WriteAttributeValue("xmlns", "t", "http://schemas.microsoft.com/exchange/services/2006/types")
+	w.EndRoot()
 
 	w.WriteStartElement(xmlNamespace.Soap, "Header")
 
