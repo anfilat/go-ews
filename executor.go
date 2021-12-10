@@ -9,17 +9,17 @@ import (
 )
 
 //nolint:unparam
-func execute(_ context.Context, service *ews.Data, request requests.Request) (interface{}, error) {
-	if err := service.Validate(); err != nil {
+func execute(_ context.Context, sd *ews.ServiceData, request requests.Request) (interface{}, error) {
+	if err := sd.Validate(); err != nil {
 		return nil, err
 	}
 	if err := request.Validate(); err != nil {
 		return nil, err
 	}
 
-	service.EnsureClient()
+	sd.EnsureClient()
 
-	writer := ews.NewRequestWriter(service, request)
+	writer := ews.NewRequestWriter(sd, request)
 	buf, err := writer.WriteXML()
 	fmt.Println(string(buf))
 	fmt.Println(err)

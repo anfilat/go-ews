@@ -8,7 +8,7 @@ import (
 	"github.com/anfilat/go-ews/internal/errors"
 )
 
-type Data struct {
+type ServiceData struct {
 	Url                           string
 	Credentials                   ewsCredentials.ExchangeCredentials
 	Version                       exchangeVersion.Enum
@@ -21,7 +21,7 @@ type Data struct {
 	Client *Client
 }
 
-func (d *Data) EnsureClient() {
+func (d *ServiceData) EnsureClient() {
 	if d.Client != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (d *Data) EnsureClient() {
 	d.Client = NewClient(d.Url, opts...)
 }
 
-func (d *Data) Validate() error {
+func (d *ServiceData) Validate() error {
 	if d.Url == "" {
 		return errors.NewValidateError("the Url property on the ExchangeService object must be set")
 	}
@@ -61,7 +61,7 @@ func (d *Data) Validate() error {
 	return nil
 }
 
-func (d *Data) GetRequestedServiceVersionString() string {
+func (d *ServiceData) GetRequestedServiceVersionString() string {
 	if d.Exchange2007CompatibilityMode && d.Version == exchangeVersion.Exchange2007SP1 {
 		return "Exchange2007"
 	}

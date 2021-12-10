@@ -10,14 +10,14 @@ import (
 
 type RequestWriter struct {
 	w       *xmlWriter.Writer
-	Service *Data
+	sd      *ServiceData
 	request requests.Request
 }
 
-func NewRequestWriter(service *Data, request requests.Request) *RequestWriter {
+func NewRequestWriter(sd *ServiceData, request requests.Request) *RequestWriter {
 	return &RequestWriter{
 		w:       xmlWriter.New(),
-		Service: service,
+		sd:      sd,
 		request: request,
 	}
 }
@@ -62,32 +62,32 @@ func (w *RequestWriter) writeHeader() {
 
 func (w *RequestWriter) writeVersionHeader() {
 	w.w.WriteStartElement(xmlNamespace.Types, "RequestServerVersion")
-	w.w.WriteAttributeValueBool("Version", false, w.Service.GetRequestedServiceVersionString())
+	w.w.WriteAttributeValueBool("Version", false, w.sd.GetRequestedServiceVersionString())
 	w.w.WriteEndElement()
 }
 
 func (w *RequestWriter) writeDateTimePrecision() {
-	if w.Service.DateTimePrecision != dateTimePrecision.Default {
-		w.w.WriteElementValue(xmlNamespace.Types, "DateTimePrecision", w.Service.DateTimePrecision.String())
+	if w.sd.DateTimePrecision != dateTimePrecision.Default {
+		w.w.WriteElementValue(xmlNamespace.Types, "DateTimePrecision", w.sd.DateTimePrecision.String())
 	}
 }
 
 func (w *RequestWriter) writeUserOrRoles() {
-	if w.Service.ImpersonatedUserId != nil {
-		w.Service.ImpersonatedUserId.WriteToXml(w.w, w.Service.Version)
-	} else if w.Service.PrivilegedUserId != nil {
-		w.Service.PrivilegedUserId.WriteToXml(w.w, w.Service.Version)
-	} else if w.Service.ManagementRoles != nil {
-		w.Service.ManagementRoles.WriteToXml(w.w)
+	if w.sd.ImpersonatedUserId != nil {
+		w.sd.ImpersonatedUserId.WriteToXml(w.w, w.sd.Version)
+	} else if w.sd.PrivilegedUserId != nil {
+		w.sd.PrivilegedUserId.WriteToXml(w.w, w.sd.Version)
+	} else if w.sd.ManagementRoles != nil {
+		w.sd.ManagementRoles.WriteToXml(w.w)
 	}
 }
 
 func (w *RequestWriter) writeTimeZoneHeader() {
-	if w.Service.Exchange2007CompatibilityMode {
+	if w.sd.Exchange2007CompatibilityMode {
 		return
 	}
 
-	if w.Service.Version == exchangeVersion.Exchange2007SP1 || w.isEmitTimeZoneHeader() {
+	if w.sd.Version == exchangeVersion.Exchange2007SP1 || w.isEmitTimeZoneHeader() {
 		w.w.WriteStartElement(xmlNamespace.Types, "TimeZoneContext")
 
 		w.w.WriteEndElement()

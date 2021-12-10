@@ -14,12 +14,12 @@ import (
 )
 
 type ExchangeService struct {
-	data *ews.Data
+	data *ews.ServiceData
 }
 
 func New(version exchangeVersion.Enum) *ExchangeService {
 	return &ExchangeService{
-		data: &ews.Data{
+		data: &ews.ServiceData{
 			Version:           version,
 			DateTimePrecision: dateTimePrecision.Default,
 		},
