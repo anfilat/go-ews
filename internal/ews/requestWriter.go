@@ -53,7 +53,7 @@ func (w *RequestWriter) writeHeader() {
 	w.w.WriteStartElement(xmlNamespace.Soap, "Header")
 
 	w.writeVersionHeader()
-	w.writeTimeZoneHeader()
+	// w.writeTimeZoneHeader()
 	w.writeDateTimePrecision()
 	w.writeUserOrRoles()
 
@@ -82,6 +82,7 @@ func (w *RequestWriter) writeUserOrRoles() {
 	}
 }
 
+//nolint:unused
 func (w *RequestWriter) writeTimeZoneHeader() {
 	if w.sd.Exchange2007CompatibilityMode {
 		return
@@ -95,6 +96,7 @@ func (w *RequestWriter) writeTimeZoneHeader() {
 	}
 }
 
+//nolint:unused
 func (w *RequestWriter) isEmitTimeZoneHeader() bool {
 	if val, ok := w.request.(interface{ EmitTimeZoneHeader() bool }); ok {
 		return val.EmitTimeZoneHeader()
