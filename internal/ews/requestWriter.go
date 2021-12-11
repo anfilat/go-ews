@@ -3,23 +3,60 @@ package ews
 import (
 	"github.com/anfilat/go-ews/enumerations/dateTimePrecision"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
+	"github.com/anfilat/go-ews/internal/base"
 	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
-	"github.com/anfilat/go-ews/internal/requests"
 	"github.com/anfilat/go-ews/internal/xmlWriter"
 )
 
 type RequestWriter struct {
-	w       *xmlWriter.Writer
-	sd      *ServiceData
-	request requests.Request
+	w                       *xmlWriter.Writer
+	sd                      *ServiceData
+	request                 base.Request
+	isTimeZoneHeaderEmitted bool
 }
 
-func NewRequestWriter(sd *ServiceData, request requests.Request) *RequestWriter {
+func NewRequestWriter(sd *ServiceData, request base.Request) *RequestWriter {
 	return &RequestWriter{
 		w:       xmlWriter.New(),
 		sd:      sd,
 		request: request,
 	}
+}
+
+func (w *RequestWriter) GetService() base.Service {
+	return w.sd
+}
+
+func (w *RequestWriter) WriteStartElement(namespace xmlNamespace.Enum, localName string) {
+	w.w.WriteStartElement(namespace, localName)
+}
+
+func (w *RequestWriter) WriteEndElement() {
+	w.w.WriteEndElement()
+}
+
+func (w *RequestWriter) WriteElementValue(namespace xmlNamespace.Enum, localName string, value interface{}) {
+	w.w.WriteElementValue(namespace, localName, value)
+}
+
+func (w *RequestWriter) WriteAttributeValueBool(localName string, alwaysWriteEmptyString bool, value interface{}) {
+	w.w.WriteAttributeValueBool(localName, alwaysWriteEmptyString, value)
+}
+
+func (w *RequestWriter) WriteAttributeValue(namespacePrefix, localName string, value interface{}) {
+	w.w.WriteAttributeValue(namespacePrefix, localName, value)
+}
+
+func (w *RequestWriter) WriteAttributeString(namespacePrefix, localName, value string) {
+	w.w.WriteAttributeString(namespacePrefix, localName, value)
+}
+
+func (w *RequestWriter) GetIsTimeZoneHeaderEmitted() bool {
+	return w.isTimeZoneHeaderEmitted
+}
+
+func (w *RequestWriter) SetIsTimeZoneHeaderEmitted(val bool) {
+	w.isTimeZoneHeaderEmitted = val
 }
 
 func (w *RequestWriter) WriteXML() ([]byte, error) {
@@ -29,7 +66,7 @@ func (w *RequestWriter) WriteXML() ([]byte, error) {
 	w.writeHeader()
 	w.writeBody()
 
-	w.w.WriteEndElement()
+	w.WriteEndElement()
 	w.w.WriteEndDoc()
 
 	w.w.Flush()
@@ -42,43 +79,43 @@ func (w *RequestWriter) WriteXML() ([]byte, error) {
 
 func (w *RequestWriter) writeRoot() {
 	w.w.StartRoot()
-	w.w.WriteStartElement(xmlNamespace.Soap, "Envelope")
-	w.w.WriteAttributeValue("xmlns", "xsi", "http://www.w3.org/2001/XMLSchema-instance")
-	w.w.WriteAttributeValue("xmlns", "m", "http://schemas.microsoft.com/exchange/services/2006/messages")
-	w.w.WriteAttributeValue("xmlns", "t", "http://schemas.microsoft.com/exchange/services/2006/types")
+	w.WriteStartElement(xmlNamespace.Soap, "Envelope")
+	w.WriteAttributeValue("xmlns", "xsi", "http://www.w3.org/2001/XMLSchema-instance")
+	w.WriteAttributeValue("xmlns", "m", "http://schemas.microsoft.com/exchange/services/2006/messages")
+	w.WriteAttributeValue("xmlns", "t", "http://schemas.microsoft.com/exchange/services/2006/types")
 	w.w.EndRoot()
 }
 
 func (w *RequestWriter) writeHeader() {
-	w.w.WriteStartElement(xmlNamespace.Soap, "Header")
+	w.WriteStartElement(xmlNamespace.Soap, "Header")
 
 	w.writeVersionHeader()
 	// w.writeTimeZoneHeader()
 	w.writeDateTimePrecision()
 	w.writeUserOrRoles()
 
-	w.w.WriteEndElement()
+	w.WriteEndElement()
 }
 
 func (w *RequestWriter) writeVersionHeader() {
-	w.w.WriteStartElement(xmlNamespace.Types, "RequestServerVersion")
-	w.w.WriteAttributeValueBool("Version", false, w.sd.GetRequestedServiceVersionString())
-	w.w.WriteEndElement()
+	w.WriteStartElement(xmlNamespace.Types, "RequestServerVersion")
+	w.WriteAttributeValueBool("Version", false, w.sd.GetRequestedServiceVersionString())
+	w.WriteEndElement()
 }
 
 func (w *RequestWriter) writeDateTimePrecision() {
 	if w.sd.DateTimePrecision != dateTimePrecision.Default {
-		w.w.WriteElementValue(xmlNamespace.Types, "DateTimePrecision", w.sd.DateTimePrecision.String())
+		w.WriteElementValue(xmlNamespace.Types, "DateTimePrecision", w.sd.DateTimePrecision.String())
 	}
 }
 
 func (w *RequestWriter) writeUserOrRoles() {
 	if w.sd.ImpersonatedUserId != nil {
-		w.sd.ImpersonatedUserId.WriteToXml(w.w, w.sd.Version)
+		w.sd.ImpersonatedUserId.WriteToXml(w)
 	} else if w.sd.PrivilegedUserId != nil {
-		w.sd.PrivilegedUserId.WriteToXml(w.w, w.sd.Version)
+		w.sd.PrivilegedUserId.WriteToXml(w)
 	} else if w.sd.ManagementRoles != nil {
-		w.sd.ManagementRoles.WriteToXml(w.w)
+		w.sd.ManagementRoles.WriteToXml(w)
 	}
 }
 
@@ -89,10 +126,10 @@ func (w *RequestWriter) writeTimeZoneHeader() {
 	}
 
 	if w.sd.Version == exchangeVersion.Exchange2007SP1 || w.isEmitTimeZoneHeader() {
-		w.w.WriteStartElement(xmlNamespace.Types, "TimeZoneContext")
+		w.WriteStartElement(xmlNamespace.Types, "TimeZoneContext")
 
-		w.w.WriteEndElement()
-		w.w.IsTimeZoneHeaderEmitted = true
+		w.WriteEndElement()
+		w.SetIsTimeZoneHeaderEmitted(true)
 	}
 }
 
@@ -105,7 +142,7 @@ func (w *RequestWriter) isEmitTimeZoneHeader() bool {
 }
 
 func (w *RequestWriter) writeBody() {
-	w.w.WriteStartElement(xmlNamespace.Soap, "Body")
+	w.WriteStartElement(xmlNamespace.Soap, "Body")
 
-	w.w.WriteEndElement()
+	w.WriteEndElement()
 }

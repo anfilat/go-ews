@@ -6,8 +6,8 @@ import (
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/dateTimePrecision"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
-	"github.com/anfilat/go-ews/ewsCredentials"
 	"github.com/anfilat/go-ews/ewsType"
+	"github.com/anfilat/go-ews/internal/base"
 	"github.com/anfilat/go-ews/internal/ews"
 	"github.com/anfilat/go-ews/internal/requests"
 	"github.com/anfilat/go-ews/internal/validate"
@@ -26,7 +26,7 @@ func New(version exchangeVersion.Enum) *ExchangeService {
 	}
 }
 
-func (e *ExchangeService) SetCredentials(value ewsCredentials.ExchangeCredentials) {
+func (e *ExchangeService) SetCredentials(value base.ExchangeCredentials) {
 	e.data.Client = nil
 	e.data.Credentials = value
 }

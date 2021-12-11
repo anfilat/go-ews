@@ -4,6 +4,7 @@ import (
 	"github.com/anfilat/go-ews/enumerations/availabilityData"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsType"
+	"github.com/anfilat/go-ews/internal/base"
 )
 
 type getUserAvailabilityRequest struct {
@@ -18,7 +19,7 @@ func NewGetUserAvailabilityRequest(
 	timeWindow ewsType.TimeWindow,
 	requestedData availabilityData.Enum,
 	options *ewsType.AvailabilityOptions,
-) Request {
+) base.Request {
 	return &getUserAvailabilityRequest{
 		attendees:     attendees,
 		timeWindow:    &timeWindow,

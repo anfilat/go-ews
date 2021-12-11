@@ -1,10 +1,10 @@
 package ewsType
 
 import (
+	"github.com/anfilat/go-ews/internal/base"
 	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
 	"github.com/anfilat/go-ews/internal/errors"
 	"github.com/anfilat/go-ews/internal/validate"
-	"github.com/anfilat/go-ews/internal/xmlWriter"
 )
 
 type ManagementRoles struct {
@@ -29,14 +29,14 @@ func (m *ManagementRoles) Validate() error {
 	return validate.ParamSlice(m.applicationRoles, "applicationRoles")
 }
 
-func (m *ManagementRoles) WriteToXml(writer *xmlWriter.Writer) {
+func (m *ManagementRoles) WriteToXml(writer base.Writer) {
 	writer.WriteStartElement(xmlNamespace.Types, "ManagementRole")
 	m.writeRolesToXml(writer, m.userRoles, "UserRoles")
 	m.writeRolesToXml(writer, m.applicationRoles, "ApplicationRoles")
 	writer.WriteEndElement()
 }
 
-func (m *ManagementRoles) writeRolesToXml(writer *xmlWriter.Writer, roles []string, elementName string) {
+func (m *ManagementRoles) writeRolesToXml(writer base.Writer, roles []string, elementName string) {
 	if len(roles) == 0 {
 		return
 	}

@@ -6,7 +6,7 @@ import (
 
 	"github.com/anfilat/go-ews/ewsProperty"
 	"github.com/anfilat/go-ews/ewsType"
-	"github.com/anfilat/go-ews/internal/xmlWriter"
+	"github.com/anfilat/go-ews/internal/base"
 )
 
 const (
@@ -26,11 +26,11 @@ func NewTimeZonePeriod(name, id string, bias time.Duration) TimeZonePeriod {
 	return TimeZonePeriod{name, id, ewsType.TimeSpan(bias)}
 }
 
-func (t TimeZonePeriod) WriteToXml(writer *xmlWriter.Writer) {
+func (t TimeZonePeriod) WriteToXml(writer base.Writer) {
 	ewsProperty.WriteToXml(t, writer, "Period")
 }
 
-func (t TimeZonePeriod) WriteAttributesToXml(writer *xmlWriter.Writer) {
+func (t TimeZonePeriod) WriteAttributesToXml(writer base.Writer) {
 	writer.WriteAttributeValue("", "Bias", t.bias.ToXSDuration())
 	writer.WriteAttributeValue("", "Name", t.name)
 	writer.WriteAttributeValue("", "Id", t.id)

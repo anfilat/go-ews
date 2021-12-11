@@ -12,8 +12,6 @@ import (
 )
 
 type Writer struct {
-	IsTimeZoneHeaderEmitted bool
-
 	b  *bytes.Buffer
 	w  *xmlwriter.Writer
 	ec *xmlwriter.ErrCollector

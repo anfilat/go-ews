@@ -3,14 +3,14 @@ package ews
 import (
 	"github.com/anfilat/go-ews/enumerations/dateTimePrecision"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
-	"github.com/anfilat/go-ews/ewsCredentials"
 	"github.com/anfilat/go-ews/ewsType"
+	"github.com/anfilat/go-ews/internal/base"
 	"github.com/anfilat/go-ews/internal/errors"
 )
 
 type ServiceData struct {
 	Url                           string
-	Credentials                   ewsCredentials.ExchangeCredentials
+	Credentials                   base.ExchangeCredentials
 	Version                       exchangeVersion.Enum
 	ImpersonatedUserId            *ewsType.ImpersonatedUserId
 	PrivilegedUserId              *ewsType.PrivilegedUserId
@@ -66,4 +66,8 @@ func (d *ServiceData) GetRequestedServiceVersionString() string {
 		return "Exchange2007"
 	}
 	return d.Version.String()
+}
+
+func (d *ServiceData) GetVersion() exchangeVersion.Enum {
+	return d.Version
 }

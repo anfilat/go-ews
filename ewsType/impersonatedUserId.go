@@ -3,9 +3,9 @@ package ewsType
 import (
 	"github.com/anfilat/go-ews/enumerations/connectingIdType"
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
+	"github.com/anfilat/go-ews/internal/base"
 	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
 	"github.com/anfilat/go-ews/internal/errors"
-	"github.com/anfilat/go-ews/internal/xmlWriter"
 )
 
 type ImpersonatedUserId struct {
@@ -27,12 +27,12 @@ func (u *ImpersonatedUserId) Validate() error {
 	return nil
 }
 
-func (u *ImpersonatedUserId) WriteToXml(writer *xmlWriter.Writer, version exchangeVersion.Enum) {
+func (u *ImpersonatedUserId) WriteToXml(writer base.Writer) {
 	writer.WriteStartElement(xmlNamespace.Types, "ExchangeImpersonation")
 	writer.WriteStartElement(xmlNamespace.Types, "ConnectingSID")
 
 	connectingIdTypeLocalName := u.IdType.String()
-	if u.IdType == connectingIdType.SmtpAddress && version == exchangeVersion.Exchange2007SP1 {
+	if u.IdType == connectingIdType.SmtpAddress && writer.GetService().GetVersion() == exchangeVersion.Exchange2007SP1 {
 		connectingIdTypeLocalName = "PrimarySmtpAddress"
 	}
 

@@ -1,25 +1,23 @@
 package ewsProperty
 
 import (
+	"github.com/anfilat/go-ews/internal/base"
 	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
-	"github.com/anfilat/go-ews/internal/xmlWriter"
 )
 
-func WriteToXml(property interface{}, writer *xmlWriter.Writer, xmlElementName string) {
+func WriteToXml(property interface{}, writer base.Writer, xmlElementName string) {
 	WriteToXmlFull(property, writer, xmlNamespace.Types, xmlElementName)
 }
 
-func WriteToXmlFull(property interface{}, writer *xmlWriter.Writer, namespace xmlNamespace.Enum, xmlElementName string) {
+func WriteToXmlFull(property interface{}, writer base.Writer, namespace xmlNamespace.Enum, xmlElementName string) {
 	writer.WriteStartElement(namespace, xmlElementName)
-	if val, ok := property.(interface {
-		WriteAttributesToXml(writer *xmlWriter.Writer)
-	}); ok {
+
+	if val, ok := property.(base.WriterAttributesToXml); ok {
 		val.WriteAttributesToXml(writer)
 	}
-	if val, ok := property.(interface {
-		WriteElementsToXml(writer *xmlWriter.Writer)
-	}); ok {
+	if val, ok := property.(base.WriterElementsToXml); ok {
 		val.WriteElementsToXml(writer)
 	}
+
 	writer.WriteEndElement()
 }

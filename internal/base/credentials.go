@@ -1,4 +1,4 @@
-package ewsCredentials
+package base
 
 import "net/http"
 

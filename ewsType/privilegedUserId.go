@@ -5,9 +5,9 @@ import (
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/enumerations/privilegedLogonType"
 	"github.com/anfilat/go-ews/enumerations/privilegedUserIdBudgetType"
+	"github.com/anfilat/go-ews/internal/base"
 	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
 	"github.com/anfilat/go-ews/internal/errors"
-	"github.com/anfilat/go-ews/internal/xmlWriter"
 )
 
 type PrivilegedUserId struct {
@@ -32,10 +32,10 @@ func (u *PrivilegedUserId) Validate() error {
 	return nil
 }
 
-func (u *PrivilegedUserId) WriteToXml(writer *xmlWriter.Writer, version exchangeVersion.Enum) {
+func (u *PrivilegedUserId) WriteToXml(writer base.Writer) {
 	writer.WriteStartElement(xmlNamespace.Types, "OpenAsAdminOrSystemService")
 	writer.WriteAttributeString("", "LogonType", u.LogonType.String())
-	if version >= exchangeVersion.Exchange2013 && u.BudgetType != nil {
+	if writer.GetService().GetVersion() >= exchangeVersion.Exchange2013 && u.BudgetType != nil {
 		writer.WriteAttributeString("", "BudgetType", u.BudgetType.String())
 	}
 

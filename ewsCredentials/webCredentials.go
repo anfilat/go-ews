@@ -2,6 +2,8 @@ package ewsCredentials
 
 import (
 	"net/http"
+
+	"github.com/anfilat/go-ews/internal/base"
 )
 
 type webCredentials struct {
@@ -9,7 +11,7 @@ type webCredentials struct {
 	password string
 }
 
-func NewWebCredentials(userName, password string) ExchangeCredentials {
+func NewWebCredentials(userName, password string) base.ExchangeCredentials {
 	return &webCredentials{
 		userName: userName,
 		password: password,
