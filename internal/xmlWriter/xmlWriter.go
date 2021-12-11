@@ -2,6 +2,7 @@ package xmlWriter
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 
 	"github.com/shabbyrobe/xmlwriter"
@@ -73,11 +74,11 @@ func (w *Writer) WriteStartElement(namespace xmlNamespace.Enum, localName string
 }
 
 func (w *Writer) WriteEndElement() {
-	w.ec.Do(w.w.EndElem())
+	w.ec.Do(w.w.EndElemFull())
 }
 
 func (w *Writer) WriteElementValue(namespace xmlNamespace.Enum, localName string, value interface{}) {
-	if value == nil {
+	if utils.IsNil(value) {
 		return
 	}
 
@@ -154,6 +155,8 @@ func (w *Writer) checkRootUri(prefix string, uri string) bool {
 
 func (w *Writer) tryConvertObjectToString(value interface{}) (string, bool) {
 	switch val := value.(type) {
+	case fmt.Stringer:
+		return val.String(), true
 	case bool:
 		if val {
 			return "true", true

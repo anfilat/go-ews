@@ -5,6 +5,7 @@ import (
 	"github.com/anfilat/go-ews/enumerations/exchangeVersion"
 	"github.com/anfilat/go-ews/ewsType"
 	"github.com/anfilat/go-ews/internal/base"
+	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
 )
 
 type getUserAvailabilityRequest struct {
@@ -36,6 +37,10 @@ func (r *getUserAvailabilityRequest) IsSuggestionsViewRequested() bool {
 	return r.requestedData == availabilityData.Suggestions || r.requestedData == availabilityData.FreeBusyAndSuggestions
 }
 
+func (r *getUserAvailabilityRequest) GetTimeWindow() *ewsType.TimeWindow {
+	return r.timeWindow
+}
+
 func (r *getUserAvailabilityRequest) EmitTimeZoneHeader() bool {
 	return true
 }
@@ -60,4 +65,13 @@ func (r *getUserAvailabilityRequest) Validate() error {
 		return err
 	}
 	return nil
+}
+
+func (r *getUserAvailabilityRequest) WriteElementsToXml(writer base.Writer) {
+	writer.WriteStartElement(xmlNamespace.Messages, "MailboxDataArray")
+	for _, attendee := range r.attendees {
+		attendee.WriteXml(writer)
+	}
+	writer.WriteEndElement()
+	r.options.WriteToXml(writer, r)
 }

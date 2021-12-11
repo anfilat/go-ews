@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"reflect"
+
 	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
 )
 
@@ -56,4 +58,17 @@ func GetNamespaceUri(namespace xmlNamespace.Enum) string {
 		return ""
 	}
 	return ""
+}
+
+func IsNil(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+	//nolint:exhaustive
+	switch reflect.TypeOf(i).Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+		return reflect.ValueOf(i).IsNil()
+	default:
+		return false
+	}
 }

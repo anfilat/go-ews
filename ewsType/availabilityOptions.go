@@ -6,6 +6,8 @@ import (
 
 	"github.com/anfilat/go-ews/enumerations/freeBusyViewType"
 	"github.com/anfilat/go-ews/enumerations/suggestionQuality"
+	"github.com/anfilat/go-ews/internal/base"
+	"github.com/anfilat/go-ews/internal/enumerations/xmlNamespace"
 	"github.com/anfilat/go-ews/internal/errors"
 	"github.com/anfilat/go-ews/internal/validate"
 )
@@ -20,7 +22,7 @@ type AvailabilityOptions struct {
 	minimumSuggestionQuality             suggestionQuality.Enum
 	detailedSuggestionsWindow            *TimeWindow
 	currentMeetingTime                   *time.Time
-	globalObjectId                       string
+	globalObjectId                       *string
 }
 
 func NewAvailabilityOptions() *AvailabilityOptions {
@@ -34,7 +36,7 @@ func NewAvailabilityOptions() *AvailabilityOptions {
 		minimumSuggestionQuality:             suggestionQuality.Fair,
 		detailedSuggestionsWindow:            nil,
 		currentMeetingTime:                   nil,
-		globalObjectId:                       "",
+		globalObjectId:                       nil,
 	}
 }
 
@@ -84,7 +86,7 @@ func (a *AvailabilityOptions) WithCurrentMeetingTime(value *time.Time) *Availabi
 }
 
 func (a *AvailabilityOptions) WithGlobalObjectId(value string) *AvailabilityOptions {
-	a.globalObjectId = value
+	a.globalObjectId = &value
 	return a
 }
 
@@ -112,4 +114,44 @@ func (a *AvailabilityOptions) ValidateTimeWindow(timeWindow *TimeWindow) error {
 		return fmt.Errorf("mergedFreeBusyInterval must be smaller than the specified time window")
 	}
 	return nil
+}
+
+func (a *AvailabilityOptions) WriteToXml(writer base.Writer, request interface{}) {
+	timeWindow := request.(interface{ GetTimeWindow() *TimeWindow }).GetTimeWindow()
+
+	if request.(interface{ IsFreeBusyViewRequested() bool }).IsFreeBusyViewRequested() {
+		writer.WriteStartElement(xmlNamespace.Types, "FreeBusyViewOptions")
+
+		timeWindow.WriteToXmlUnscopedDatesOnly(writer, "TimeWindow")
+
+		writer.WriteElementValue(xmlNamespace.Types, "MergedFreeBusyIntervalInMinutes", a.mergedFreeBusyInterval)
+		writer.WriteElementValue(xmlNamespace.Types, "RequestedView", a.requestedFreeBusyView)
+
+		writer.WriteEndElement()
+	}
+
+	if request.(interface{ IsSuggestionsViewRequested() bool }).IsSuggestionsViewRequested() {
+		writer.WriteStartElement(xmlNamespace.Types, "SuggestionsViewOptions")
+
+		writer.WriteElementValue(xmlNamespace.Types, "GoodThreshold", a.goodSuggestionThreshold)
+		writer.WriteElementValue(xmlNamespace.Types, "MaximumResultsByDay", a.maximumSuggestionsPerDay)
+		writer.WriteElementValue(xmlNamespace.Types, "MaximumNonWorkHourResultsByDay", a.maximumNonWorkHoursSuggestionsPerDay)
+		writer.WriteElementValue(xmlNamespace.Types, "MeetingDurationInMinutes", a.meetingDuration)
+		writer.WriteElementValue(xmlNamespace.Types, "MinimumSuggestionQuality", a.minimumSuggestionQuality)
+
+		timeWindowToSerialize := timeWindow
+		if a.detailedSuggestionsWindow != nil {
+			timeWindowToSerialize = a.detailedSuggestionsWindow
+		}
+
+		timeWindowToSerialize.WriteToXmlUnscopedDatesOnly(writer, "DetailedSuggestionsWindow")
+
+		if a.currentMeetingTime != nil {
+			writer.WriteElementValue(xmlNamespace.Types, "CurrentMeetingTime", a.currentMeetingTime)
+		}
+
+		writer.WriteElementValue(xmlNamespace.Types, "GlobalObjectId", a.globalObjectId)
+
+		writer.WriteEndElement()
+	}
 }

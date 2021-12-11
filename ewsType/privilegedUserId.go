@@ -34,9 +34,9 @@ func (u *PrivilegedUserId) Validate() error {
 
 func (u *PrivilegedUserId) WriteToXml(writer base.Writer) {
 	writer.WriteStartElement(xmlNamespace.Types, "OpenAsAdminOrSystemService")
-	writer.WriteAttributeString("", "LogonType", u.LogonType.String())
+	writer.WriteAttributeValue("", "LogonType", u.LogonType)
 	if writer.GetService().GetVersion() >= exchangeVersion.Exchange2013 && u.BudgetType != nil {
-		writer.WriteAttributeString("", "BudgetType", u.BudgetType.String())
+		writer.WriteAttributeValue("", "BudgetType", u.BudgetType)
 	}
 
 	writer.WriteStartElement(xmlNamespace.Types, "ConnectingSID")

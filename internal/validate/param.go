@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/anfilat/go-ews/internal/errors"
+	"github.com/anfilat/go-ews/internal/utils"
 )
 
 type selfValidate interface {
@@ -42,7 +43,7 @@ func ParamSlice(param interface{}, paramName string) error {
 }
 
 func ParamAllowNull(param interface{}, paramName string) error {
-	if isNil(param) {
+	if utils.IsNil(param) {
 		return nil
 	}
 
@@ -56,17 +57,4 @@ func ParamAllowNull(param interface{}, paramName string) error {
 	}
 
 	return nil
-}
-
-func isNil(i interface{}) bool {
-	if i == nil {
-		return true
-	}
-	//nolint:exhaustive
-	switch reflect.TypeOf(i).Kind() {
-	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
-		return reflect.ValueOf(i).IsNil()
-	default:
-		return false
-	}
 }

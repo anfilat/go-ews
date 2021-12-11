@@ -25,7 +25,7 @@ func main() {
 
 	attendee := []ewsType.AttendeeInfo{
 		ewsType.NewAttendeeInfo("adelev" + domain),
-		ewsType.NewAttendeeInfo("akexw" + domain),
+		ewsType.NewAttendeeInfo("alexw" + domain),
 	}
 	timeWindow := ewsType.NewTimeWindow(time.Now(), time.Now().Add(2*24*time.Hour))
 
@@ -37,6 +37,6 @@ func main() {
 }
 
 func secret(fileName string) string {
-	data, _ := os.ReadFile("./examples/secret/" + fileName)
+	data, _ := os.ReadFile("./_examples/secret/" + fileName)
 	return strings.TrimSpace(string(data))
 }

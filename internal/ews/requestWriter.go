@@ -105,7 +105,7 @@ func (w *RequestWriter) writeVersionHeader() {
 
 func (w *RequestWriter) writeDateTimePrecision() {
 	if w.sd.DateTimePrecision != dateTimePrecision.Default {
-		w.WriteElementValue(xmlNamespace.Types, "DateTimePrecision", w.sd.DateTimePrecision.String())
+		w.WriteElementValue(xmlNamespace.Types, "DateTimePrecision", w.sd.DateTimePrecision)
 	}
 }
 
@@ -143,6 +143,17 @@ func (w *RequestWriter) isEmitTimeZoneHeader() bool {
 
 func (w *RequestWriter) writeBody() {
 	w.WriteStartElement(xmlNamespace.Soap, "Body")
+
+	w.WriteStartElement(xmlNamespace.Messages, w.request.GetXmlElementName())
+
+	if val, ok := w.request.(base.WriterAttributesToXml); ok {
+		val.WriteAttributesToXml(w)
+	}
+	if val, ok := w.request.(base.WriterElementsToXml); ok {
+		val.WriteElementsToXml(w)
+	}
+
+	w.WriteEndElement()
 
 	w.WriteEndElement()
 }
